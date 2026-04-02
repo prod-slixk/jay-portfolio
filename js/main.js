@@ -203,21 +203,57 @@ function initModal() {
     const mobileContactBtn = document.getElementById('mobileContactBtn');
     const closeModalBtn = document.getElementById('closeModal');
     const modalOverlay = document.getElementById('modalOverlay');
+    const modal = modalOverlay ? modalOverlay.querySelector('.modal') : null;
     const contactForm = document.getElementById('contactForm');
     const successMessage = document.getElementById('successMessage');
-    
-    if (!modalOverlay) return;
-    
+
+    if (!modalOverlay || !modal) return;
+
+    let lastFocusedElement = null;
+    let removeFocusTrap = null;
+
+    function trapFocus(modalEl) {
+        const focusable = modalEl.querySelectorAll(
+            'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        );
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+
+        first.focus();
+
+        function onKeyDown(e) {
+            if (e.key !== 'Tab') return;
+            if (e.shiftKey) {
+                if (document.activeElement === first) {
+                    e.preventDefault();
+                    last.focus();
+                }
+            } else {
+                if (document.activeElement === last) {
+                    e.preventDefault();
+                    first.focus();
+                }
+            }
+        }
+
+        modalEl.addEventListener('keydown', onKeyDown);
+        return () => modalEl.removeEventListener('keydown', onKeyDown);
+    }
+
     // Open modal functions
     const openModal = () => {
+        lastFocusedElement = document.activeElement;
         modalOverlay.classList.add('active');
         document.body.style.overflow = 'hidden';
+        removeFocusTrap = trapFocus(modal);
     };
-    
+
     const closeModal = () => {
+        if (removeFocusTrap) { removeFocusTrap(); removeFocusTrap = null; }
         modalOverlay.classList.remove('active');
         document.body.style.overflow = '';
-        
+        if (lastFocusedElement) { lastFocusedElement.focus(); lastFocusedElement = null; }
+
         // Reset form after animation
         setTimeout(() => {
             if (contactForm) {
@@ -250,15 +286,41 @@ function initModal() {
     
     // Form submission
     if (contactForm) {
-        contactForm.addEventListener('submit', (e) => {
+        contactForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            
-            // Show success message
-            contactForm.classList.add('hidden');
-            successMessage.classList.add('show');
-            
-            // Auto close after delay
-            setTimeout(closeModal, 2500);
+
+            const submitBtn = contactForm.querySelector('.form-submit');
+            const submitText = submitBtn.querySelector('.submit-text');
+            const errorMessage = document.getElementById('errorMessage');
+
+            // Loading state
+            submitBtn.disabled = true;
+            submitText.textContent = 'SENDING_...';
+            if (errorMessage) errorMessage.classList.remove('show');
+
+            const formData = new FormData(contactForm);
+            formData.append('access_key', '3bb8bd3a-8ee7-46a7-b7dc-5c2cacbcc0c1');
+
+            try {
+                const response = await fetch('https://api.web3forms.com/submit', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    contactForm.classList.add('hidden');
+                    if (successMessage) successMessage.classList.add('show');
+                    setTimeout(closeModal, 2500);
+                } else {
+                    throw new Error(data.message || 'Submission failed');
+                }
+            } catch {
+                submitText.textContent = 'SEND_MESSAGE';
+                submitBtn.disabled = false;
+                if (errorMessage) errorMessage.classList.add('show');
+            }
         });
     }
 }

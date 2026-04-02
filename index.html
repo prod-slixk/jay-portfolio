@@ -390,22 +390,29 @@
                 </article>
 
                 <!-- Project 3: Coming Soon -->
-                <article class="project-card coming-soon">
+                <article class="project-card">
                     <div class="project-image">
-                        <div class="project-placeholder">
-                            <span class="placeholder-icon">🚧</span>
-                            <span class="placeholder-text">LOADING...</span>
-                        </div>
+                        <img src="assets/aniverse-mockup.png" alt="AniVerse - Anime discovery and info site" class="project-img">
                     </div>
                     <div class="project-content">
                         <div class="project-header">
-                            <h3 class="project-title">NEXT_PROJECT</h3>
+                            <h3 class="project-title">ANIVERSE</h3>
+                            <div class="project-links">
+                                <a href="https://github.com/prod-slixk/aniverse-go" class="project-link" title="View Code" target="_blank" rel="noopener noreferrer">
+                                    <span>{ }</span>
+                                </a>
+                                <a href="https://aniverse-8bbif7c7x-jays-projects-b600db37.vercel.app/" class="project-link" title="Live Demo" target="_blank" rel="noopener noreferrer">
+                                    <span>↗</span>
+                                </a>
+                            </div>
                         </div>
                         <p class="project-description">
-                            Currently in development. Stay tuned for more projects...
+                            Anime discovery platform powered by a live API. Search any anime and get full details — ratings, synopsis, genres, and more.
                         </p>
                         <div class="project-tags">
-                            <span class="tag">???</span>
+                            <span class="tag">HTML</span>
+                            <span class="tag">CSS</span>
+                            <span class="tag">JAVASCRIPT</span>
                         </div>
                     </div>
                     <div class="project-glitch-line"></div>
@@ -429,19 +436,22 @@
             </div>
 
             <form class="contact-form" id="contactForm">
+                <!-- Web3Forms honeypot spam protection -->
+                <input type="checkbox" name="botcheck" class="botcheck" aria-hidden="true" tabindex="-1">
+
                 <div class="form-group">
                     <label class="form-label" for="name">&gt; NAME_</label>
-                    <input type="text" class="form-input" id="name" name="name" placeholder="Enter your name" required>
+                    <input type="text" class="form-input" id="name" name="name" placeholder="Enter your name" aria-label="Your name" required>
                 </div>
 
                 <div class="form-group">
                     <label class="form-label" for="email">&gt; EMAIL_</label>
-                    <input type="email" class="form-input" id="email" name="email" placeholder="Enter your email" required>
+                    <input type="email" class="form-input" id="email" name="email" placeholder="Enter your email" aria-label="Your email address" required>
                 </div>
 
                 <div class="form-group">
                     <label class="form-label" for="message">&gt; MESSAGE_</label>
-                    <textarea class="form-textarea" id="message" name="message" placeholder="What's on your mind?" required></textarea>
+                    <textarea class="form-textarea" id="message" name="message" placeholder="What's on your mind?" aria-label="Your message" required></textarea>
                 </div>
 
                 <button type="submit" class="form-submit">
@@ -450,10 +460,15 @@
                 </button>
             </form>
 
-            <div class="success-message" id="successMessage">
+            <div class="success-message" id="successMessage" role="status">
                 <div class="success-icon">✓</div>
                 <h3 class="success-title">MESSAGE_SENT</h3>
                 <p class="success-text">> Connection established. I'll respond soon.</p>
+            </div>
+
+            <div class="error-message" id="errorMessage" role="alert">
+                <div class="error-icon">✗</div>
+                <p class="error-text">> Transmission failed. Check connection and retry.</p>
             </div>
         </div>
     </div>

@@ -15,7 +15,7 @@
     --gray-300: #c0c0c0;
     --gray-400: #a0a0a0;
     --gray-500: #808080;
-    --gray-600: #606060;
+    --gray-600: #767676;
     --gray-700: #404040;
     --gray-800: #202020;
     --gray-900: #101010;
@@ -26,9 +26,9 @@
     --bg-card: #0a0a0a;
     --text-primary: #ffffff;
     --text-secondary: #a0a0a0;
-    --text-muted: #606060;
+    --text-muted: #767676;
     --border-color: #404040;
-    --border-light: #606060;
+    --border-light: #767676;
     
     /* Typography */
     --font-display: 'VT323', monospace;
@@ -930,28 +930,7 @@ h1, h2, h3, h4, h5, h6, p, span, label {
    Projects Section - Zine/Poster Style
    =================================== */
 .projects {
-    position: relative;
-    background-image: url('../assets/projects-bg.webp');
-    background-size: contain;
-    background-position: center;
-    background-repeat: no-repeat;
     background-color: var(--black);
-}
-
-.projects::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.75);
-    z-index: 1;
-}
-
-.projects .container {
-    position: relative;
-    z-index: 2;
 }
 
 .projects-grid {
@@ -1625,6 +1604,30 @@ h1, h2, h3, h4, h5, h6, p, span, label {
     display: block;
 }
 
+.error-message {
+    display: none;
+    text-align: center;
+    padding: var(--spacing-lg) var(--spacing-2xl);
+    background: var(--black);
+    border-top: 2px solid var(--white);
+}
+
+.error-message.show {
+    display: block;
+}
+
+.error-icon {
+    font-size: 1.5rem;
+    color: var(--white);
+    margin-bottom: var(--spacing-sm);
+}
+
+.error-text {
+    color: var(--gray-400);
+    font-family: var(--font-mono);
+    font-size: 0.9rem;
+}
+
 .success-icon {
     width: 60px;
     height: 60px;
@@ -1653,6 +1656,10 @@ h1, h2, h3, h4, h5, h6, p, span, label {
 }
 
 .contact-form.hidden {
+    display: none;
+}
+
+.botcheck {
     display: none;
 }
 
@@ -1811,10 +1818,6 @@ h1, h2, h3, h4, h5, h6, p, span, label {
         display: none;
     }
     
-    .projects {
-        background-size: cover;
-        background-position: top center;
-    }
 }
 
 @media (max-width: 480px) {
