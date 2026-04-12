@@ -387,7 +387,7 @@ h1, h2, h3, h4, h5, h6, p, span, label {
     background: var(--black);
 }
 
-/* Background Image */
+/* Background GIF */
 .hero::before {
     content: '';
     position: absolute;
@@ -395,11 +395,12 @@ h1, h2, h3, h4, h5, h6, p, span, label {
     left: 0;
     right: 0;
     bottom: 0;
-    background-image: url('../assets/hero-bg.jpg');
+    background-image: url('https://media1.tenor.com/images/044b65d56501cc470ece8ede12b2b1dd/tenor.gif?itemid=17189298');
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
-    opacity: 0.4;
+    opacity: 0.55;
+    filter: saturate(0.8) brightness(0.9);
 }
 
 /* Dark overlay for text readability */
@@ -412,9 +413,10 @@ h1, h2, h3, h4, h5, h6, p, span, label {
     bottom: 0;
     background: linear-gradient(
         to bottom,
-        rgba(0, 0, 0, 0.7) 0%,
-        rgba(0, 0, 0, 0.5) 50%,
-        rgba(0, 0, 0, 0.9) 100%
+        rgba(0, 0, 0, 0.75) 0%,
+        rgba(0, 0, 0, 0.45) 40%,
+        rgba(0, 0, 0, 0.45) 60%,
+        rgba(0, 0, 0, 0.85) 100%
     );
 }
 
