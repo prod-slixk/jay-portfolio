@@ -120,17 +120,7 @@ h1, h2, h3, h4, h5, h6, p, span, label {
     background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
-/* ===================================
-   3D Background Canvas
-   =================================== */
-.bg-canvas {
-    position: fixed;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    z-index: -1;
-    pointer-events: none;
-}
+/* bg-canvas removed — Three.js environment stripped */
 
 /* ===================================
    Glitch Effects
@@ -898,17 +888,60 @@ h1, h2, h3, h4, h5, h6, p, span, label {
 /* ===================================
    Projects Section
    =================================== */
-.projects { background-color: var(--black); }
+.projects {
+    background: var(--black);
+    position: relative;
+    overflow: hidden;
+}
 
-/* Grid layout:
-   Desktop:  [featured full-width] / [3-col] / [2-col centered]
-   Tablet:   2-col, featured full-width
-   Mobile:   1-col */
+/* skills-bg.jpg texture overlay */
+.projects::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: url('../assets/skills-bg.jpg');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    opacity: 0.08;
+    filter: grayscale(1) brightness(0.6);
+    z-index: 0;
+    pointer-events: none;
+}
+
+/* Dark gradient vignette over texture */
+.projects::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        to bottom,
+        rgba(0,0,0,0.7) 0%,
+        rgba(0,0,0,0.4) 50%,
+        rgba(0,0,0,0.7) 100%
+    );
+    z-index: 0;
+    pointer-events: none;
+}
+
+/* Lift content above pseudo-elements */
+.projects .container { position: relative; z-index: 1; }
+
+/* ─── Magazine Editorial Grid ──────────────────────────────
+   Desktop:  AniVerse (2/3) | Treact (1/3)   ← top row
+             Ultra | Skinstric | Summarist    ← bottom row
+   Tablet:   AniVerse full-width / 2-col bottom
+   Mobile:   Single column
+   ─────────────────────────────────────────────────────── */
 .projects-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: var(--space-xl);
+    grid-template-rows: auto auto;
+    gap: var(--space-lg);
 }
+
+/* AniVerse hero tile: spans first two columns */
+.project-card:nth-child(1) { grid-column: 1 / 3; }
 
 /* ── Project Card ── */
 .project-card {
@@ -920,40 +953,52 @@ h1, h2, h3, h4, h5, h6, p, span, label {
     flex-direction: column;
     transform-style: preserve-3d;
     will-change: transform;
-    transition: border-color var(--t-normal), transform var(--t-spring), box-shadow var(--t-spring);
+    transition:
+        border-color var(--t-normal),
+        transform var(--t-spring),
+        box-shadow var(--t-spring);
+}
+
+/* Corner targeting brackets */
+.project-card::before,
+.project-card::after {
+    content: '';
+    position: absolute;
+    width: 14px;
+    height: 14px;
+    z-index: 3;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.22s ease, width 0.22s ease, height 0.22s ease;
+}
+
+.project-card::before {
+    top: 10px;
+    left: 10px;
+    border-top: 1px solid var(--white);
+    border-left: 1px solid var(--white);
+}
+
+.project-card::after {
+    bottom: 10px;
+    right: 10px;
+    border-bottom: 1px solid var(--white);
+    border-right: 1px solid var(--white);
 }
 
 .project-card:hover {
     border-color: var(--white);
-    transform: translateY(-6px);
-    box-shadow: 0 16px 48px rgba(255, 255, 255, 0.04);
+    transform: translateY(-8px);
+    box-shadow:
+        0 24px 64px rgba(255, 255, 255, 0.05),
+        0 0 0 1px rgba(255, 255, 255, 0.06);
 }
 
-/* Featured card spans full row */
-.project-card.featured {
-    grid-column: 1 / -1;
-    flex-direction: row;
-}
-
-.project-card.featured .project-image {
-    width: 55%;
-    min-width: 55%;
-    height: auto;
-    min-height: 320px;
-    flex-shrink: 0;
-}
-
-.project-card.featured .project-content {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-}
-
-/* Cards 04 & 05 — center-aligned bottom row */
-.project-card:nth-child(4),
-.project-card:nth-child(5) {
-    /* stay in natural flow — JS grid handles if needed */
+.project-card:hover::before,
+.project-card:hover::after {
+    opacity: 1;
+    width: 22px;
+    height: 22px;
 }
 
 /* ── Project Image ── */
@@ -964,22 +1009,52 @@ h1, h2, h3, h4, h5, h6, p, span, label {
     overflow: hidden;
     border-bottom: 2px solid var(--gray-700);
     transition: border-color var(--t-normal);
+    flex-shrink: 0;
+}
+
+/* Top-row cards (hero + sidebar) get taller images */
+.project-card:nth-child(1) .project-image,
+.project-card:nth-child(2) .project-image {
+    height: 300px;
 }
 
 .project-card:hover .project-image { border-bottom-color: var(--white); }
+
+/* Scan-line sweep inside image on hover */
+.project-image::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: rgba(255, 255, 255, 0.7);
+    z-index: 3;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.project-card:hover .project-image::before {
+    animation: scanSweep 0.65s ease-out forwards;
+}
+
+@keyframes scanSweep {
+    0%   { top: 0;    opacity: 0.9; }
+    100% { top: 100%; opacity: 0;   }
+}
 
 .project-img {
     width: 100%;
     height: 100%;
     object-fit: cover;
     object-position: top;
-    filter: grayscale(30%) brightness(0.92);
-    transition: filter var(--t-normal), transform var(--t-normal);
+    filter: grayscale(40%) brightness(0.85);
+    transition: filter 0.45s ease, transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .project-card:hover .project-img {
-    filter: grayscale(0%) brightness(1);
-    transform: scale(1.04);
+    filter: grayscale(0%) brightness(1.05);
+    transform: scale(1.07);
 }
 
 /* Pattern placeholder (Summarist) */
@@ -997,7 +1072,6 @@ h1, h2, h3, h4, h5, h6, p, span, label {
     align-items: center;
     justify-content: center;
     overflow: hidden;
-    /* Dither dot pattern */
     background-image:
         radial-gradient(circle, var(--gray-700) 1px, transparent 1px),
         radial-gradient(circle, var(--gray-800) 1px, transparent 1px);
@@ -1023,15 +1097,30 @@ h1, h2, h3, h4, h5, h6, p, span, label {
     color: var(--white);
 }
 
-/* ── Image Overlay with Badges ── */
-.project-image-overlay {
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(to bottom, transparent 40%, rgba(0,0,0,0.55) 100%);
-    pointer-events: none;
-    transition: opacity var(--t-normal);
+/* Ultraverse — grid line variant */
+.project-image--grid .project-pattern-bg {
+    background-image:
+        linear-gradient(var(--gray-800) 1px, transparent 1px),
+        linear-gradient(90deg, var(--gray-800) 1px, transparent 1px);
+    background-size: 28px 28px;
+    opacity: 0.5;
 }
 
+/* Skinstric — horizontal scan line variant */
+.project-image--scan .project-pattern-bg {
+    background-image:
+        repeating-linear-gradient(
+            0deg,
+            transparent,
+            transparent 3px,
+            var(--gray-800) 3px,
+            var(--gray-800) 4px
+        );
+    background-size: 100% 4px;
+    opacity: 0.45;
+}
+
+/* ── Badges — always visible above overlay ── */
 .project-badges {
     position: absolute;
     top: var(--space-md);
@@ -1040,6 +1129,7 @@ h1, h2, h3, h4, h5, h6, p, span, label {
     gap: var(--space-xs);
     flex-direction: column;
     align-items: flex-end;
+    z-index: 4;
     pointer-events: none;
 }
 
@@ -1065,6 +1155,42 @@ h1, h2, h3, h4, h5, h6, p, span, label {
     font-size: 0.62rem;
 }
 
+/* ── Image Overlay — slides up on hover ── */
+.project-image-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        to top,
+        rgba(0, 0, 0, 0.88) 0%,
+        rgba(0, 0, 0, 0.25) 50%,
+        transparent 100%
+    );
+    display: flex;
+    align-items: flex-end;
+    z-index: 2;
+    transform: translateY(100%);
+    transition: transform 0.42s cubic-bezier(0.16, 1, 0.3, 1);
+    pointer-events: none;
+}
+
+.project-card:hover .project-image-overlay {
+    transform: translateY(0);
+}
+
+/* VIEW_PROJECT CTA inside overlay */
+.project-view-cta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding: var(--space-md);
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    letter-spacing: 3px;
+    color: var(--white);
+    text-transform: uppercase;
+}
+
 /* ── Project Content ── */
 .project-content {
     padding: var(--space-lg);
@@ -1083,10 +1209,13 @@ h1, h2, h3, h4, h5, h6, p, span, label {
     line-height: 1;
     pointer-events: none;
     user-select: none;
-    transition: color var(--t-normal);
+    transition: color var(--t-normal), transform var(--t-normal);
 }
 
-.project-card:hover .project-index { color: var(--gray-700); }
+.project-card:hover .project-index {
+    color: var(--gray-700);
+    transform: translateX(-4px);
+}
 
 .project-header {
     display: flex;
@@ -1164,7 +1293,7 @@ h1, h2, h3, h4, h5, h6, p, span, label {
     color: var(--gray-300);
 }
 
-/* Glitch line at bottom of card */
+/* Glitch line at card bottom */
 .project-glitch-line {
     height: 2px;
     background: var(--white);
@@ -1179,7 +1308,7 @@ h1, h2, h3, h4, h5, h6, p, span, label {
 }
 
 @keyframes glitchLine {
-    0%, 100% { transform: translateX(0);   }
+    0%, 100% { transform: translateX(0);    }
     25%       { transform: translateX(-5px); }
     75%       { transform: translateX( 5px); }
 }
@@ -1748,14 +1877,9 @@ h1, h2, h3, h4, h5, h6, p, span, label {
 
     .about-content { grid-template-columns: 1fr; }
 
-    /* Featured card: stack vertically */
-    .project-card.featured {
-        flex-direction: column;
-    }
-    .project-card.featured .project-image {
-        width: 100%;
-        min-height: 240px;
-    }
+    /* AniVerse spans full width on tablet */
+    .project-card:nth-child(1) { grid-column: 1 / -1; }
+    .project-card:nth-child(1) .project-image { height: 260px; }
 
     /* 2-col grid on tablet */
     .projects-grid { grid-template-columns: repeat(2, 1fr); }
@@ -1782,21 +1906,11 @@ h1, h2, h3, h4, h5, h6, p, span, label {
     .hacker-terminal,
     .contact-card    { display: none; }
 
-    /* 1-col project grid */
-    .projects-grid {
-        grid-template-columns: 1fr;
-    }
-
-    /* Remove featured span — all cards stack */
-    .project-card.featured {
-        grid-column: auto;
-        flex-direction: column;
-    }
-
-    .project-card.featured .project-image {
-        width: 100%;
-        min-height: 200px;
-    }
+    /* 1-col project grid — all cards natural flow */
+    .projects-grid { grid-template-columns: 1fr; }
+    .project-card:nth-child(1) { grid-column: auto; }
+    .project-card:nth-child(1) .project-image,
+    .project-card:nth-child(2) .project-image { height: 220px; }
 
     .skills-grid { grid-template-columns: 1fr; }
 

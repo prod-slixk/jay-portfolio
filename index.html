@@ -15,9 +15,6 @@
 </head>
 <body>
 
-    <!-- 3D Environment Canvas -->
-    <canvas id="bg-canvas" class="bg-canvas" aria-hidden="true"></canvas>
-
     <!-- Scanline Overlay -->
     <div class="scanlines" aria-hidden="true"></div>
 
@@ -364,19 +361,23 @@
 
             <div class="projects-grid">
 
-                <!-- 01 — AniVerse (Featured) -->
-                <article class="project-card featured" data-index="01">
+                <!-- 01 — AniVerse (editorial hero — spans 2/3 width) -->
+                <article class="project-card" data-index="01">
                     <div class="project-image">
                         <img
                             src="assets/aniverse-mockup.png"
-                            alt="AniVerse — Anime discovery and info platform"
+                            alt="AniVerse — Anime discovery platform"
                             class="project-img"
                             loading="lazy"
                         >
+                        <div class="project-badges">
+                            <span class="badge badge-featured">FEATURED</span>
+                            <span class="badge badge-live">● LIVE</span>
+                        </div>
                         <div class="project-image-overlay">
-                            <div class="project-badges">
-                                <span class="badge badge-featured">FEATURED</span>
-                                <span class="badge badge-live">● LIVE</span>
+                            <div class="project-view-cta">
+                                <span>VIEW_PROJECT</span>
+                                <span aria-hidden="true">→</span>
                             </div>
                         </div>
                     </div>
@@ -394,7 +395,7 @@
                             </div>
                         </div>
                         <p class="project-description">
-                            Anime discovery platform powered by a live API. Search any anime and get full details — ratings, synopsis, genres, and more. Built with a focus on fast queries and clean UI.
+                            Anime discovery platform powered by a live API. Search any title and get full details — ratings, synopsis, genres, episode counts. Fast queries, clean UI.
                         </p>
                         <div class="project-tags">
                             <span class="tag">HTML</span>
@@ -406,18 +407,22 @@
                     <div class="project-glitch-line" aria-hidden="true"></div>
                 </article>
 
-                <!-- 02 — Treact -->
+                <!-- 02 — Treact (editorial sidebar) -->
                 <article class="project-card" data-index="02">
                     <div class="project-image">
                         <img
                             src="assets/treact-mockup.png"
-                            alt="Treact — React landing page with custom testimonial slider"
+                            alt="Treact — SaaS landing page"
                             class="project-img"
                             loading="lazy"
                         >
+                        <div class="project-badges">
+                            <span class="badge badge-live">● LIVE</span>
+                        </div>
                         <div class="project-image-overlay">
-                            <div class="project-badges">
-                                <span class="badge badge-live">● LIVE</span>
+                            <div class="project-view-cta">
+                                <span>VIEW_PROJECT</span>
+                                <span aria-hidden="true">→</span>
                             </div>
                         </div>
                     </div>
@@ -435,7 +440,7 @@
                             </div>
                         </div>
                         <p class="project-description">
-                            Responsive landing page with a custom testimonial slider. Built with attention to modern design principles, smooth interactions, and pixel-perfect layout.
+                            SaaS landing page with a custom testimonial slider. Modern design principles, smooth micro-interactions, pixel-perfect layout.
                         </p>
                         <div class="project-tags">
                             <span class="tag">HTML</span>
@@ -446,18 +451,22 @@
                     <div class="project-glitch-line" aria-hidden="true"></div>
                 </article>
 
-                <!-- 03 — Ultraverse (NFT Marketplace) -->
+                <!-- 03 — Ultraverse -->
                 <article class="project-card" data-index="03">
                     <div class="project-image">
                         <img
                             src="assets/nftmp-mockup.png"
-                            alt="Ultraverse — NFT Marketplace platform"
+                            alt="Ultraverse — NFT Marketplace"
                             class="project-img"
                             loading="lazy"
                         >
+                        <div class="project-badges">
+                            <span class="badge badge-live">● LIVE</span>
+                        </div>
                         <div class="project-image-overlay">
-                            <div class="project-badges">
-                                <span class="badge badge-live">● LIVE</span>
+                            <div class="project-view-cta">
+                                <span>VIEW_PROJECT</span>
+                                <span aria-hidden="true">→</span>
                             </div>
                         </div>
                     </div>
@@ -466,7 +475,7 @@
                         <div class="project-header">
                             <h3 class="project-title">ULTRAVERSE</h3>
                             <div class="project-links">
-                                <a href="#" class="project-link" title="View Source Code" target="_blank" rel="noopener noreferrer" aria-label="Ultraverse source code">
+                                <a href="https://github.com/prod-slixk/jay-internship" class="project-link" title="View Source Code" target="_blank" rel="noopener noreferrer" aria-label="Ultraverse source code on GitHub">
                                     <span aria-hidden="true">{ }</span>
                                 </a>
                                 <a href="https://jay-internship-psi.vercel.app" class="project-link" title="Live Demo" target="_blank" rel="noopener noreferrer" aria-label="Ultraverse live demo">
@@ -475,7 +484,7 @@
                             </div>
                         </div>
                         <p class="project-description">
-                            NFT marketplace platform — browse, discover, and interact with digital assets in a fully responsive interface with smooth collection browsing.
+                            NFT marketplace — browse, discover, and interact with digital collectibles. Fully responsive with smooth collection browsing.
                         </p>
                         <div class="project-tags">
                             <span class="tag">HTML</span>
@@ -491,13 +500,17 @@
                     <div class="project-image">
                         <img
                             src="assets/skinstric-mockup.png"
-                            alt="Skinstric-AI — AI-powered skincare analysis app"
+                            alt="Skinstric-AI — AI skincare analysis"
                             class="project-img"
                             loading="lazy"
                         >
+                        <div class="project-badges">
+                            <span class="badge badge-live">● LIVE</span>
+                        </div>
                         <div class="project-image-overlay">
-                            <div class="project-badges">
-                                <span class="badge badge-live">● LIVE</span>
+                            <div class="project-view-cta">
+                                <span>VIEW_PROJECT</span>
+                                <span aria-hidden="true">→</span>
                             </div>
                         </div>
                     </div>
@@ -506,7 +519,7 @@
                         <div class="project-header">
                             <h3 class="project-title">SKINSTRIC-AI</h3>
                             <div class="project-links">
-                                <a href="#" class="project-link" title="View Source Code" target="_blank" rel="noopener noreferrer" aria-label="Skinstric-AI source code">
+                                <a href="https://github.com/prod-slixk/skinstric-ai" class="project-link" title="View Source Code" target="_blank" rel="noopener noreferrer" aria-label="Skinstric-AI source code on GitHub">
                                     <span aria-hidden="true">{ }</span>
                                 </a>
                                 <a href="https://skinstric-ai-theta.vercel.app" class="project-link" title="Live Demo" target="_blank" rel="noopener noreferrer" aria-label="Skinstric-AI live demo">
@@ -515,7 +528,7 @@
                             </div>
                         </div>
                         <p class="project-description">
-                            AI-powered skincare analysis application. Input your skin profile and receive personalized product recommendations driven by machine learning.
+                            AI-powered skincare analysis app. Input your profile, get ML-driven product recommendations — personalized in seconds.
                         </p>
                         <div class="project-tags">
                             <span class="tag">REACT</span>
@@ -528,13 +541,20 @@
 
                 <!-- 05 — Summarist -->
                 <article class="project-card" data-index="05">
-                    <div class="project-image project-image--pattern">
-                        <div class="project-pattern-bg" aria-hidden="true">
-                            <span class="pattern-text">SUMMARIST</span>
+                    <div class="project-image">
+                        <img
+                            src="assets/summarist-mockup.png"
+                            alt="Summarist — E-commerce book platform"
+                            class="project-img"
+                            loading="lazy"
+                        >
+                        <div class="project-badges">
+                            <span class="badge badge-live">● LIVE</span>
                         </div>
                         <div class="project-image-overlay">
-                            <div class="project-badges">
-                                <span class="badge badge-live">● LIVE</span>
+                            <div class="project-view-cta">
+                                <span>VIEW_PROJECT</span>
+                                <span aria-hidden="true">→</span>
                             </div>
                         </div>
                     </div>
@@ -543,7 +563,7 @@
                         <div class="project-header">
                             <h3 class="project-title">SUMMARIST</h3>
                             <div class="project-links">
-                                <a href="#" class="project-link" title="View Source Code" target="_blank" rel="noopener noreferrer" aria-label="Summarist source code">
+                                <a href="https://github.com/prod-slixk/summarist" class="project-link" title="View Source Code" target="_blank" rel="noopener noreferrer" aria-label="Summarist source code">
                                     <span aria-hidden="true">{ }</span>
                                 </a>
                                 <a href="https://summarist-chi.vercel.app" class="project-link" title="Live Demo" target="_blank" rel="noopener noreferrer" aria-label="Summarist live demo">
@@ -552,7 +572,7 @@
                             </div>
                         </div>
                         <p class="project-description">
-                            E-commerce book platform with subscription-based access to summarized non-fiction titles. Clean reading experience with Stripe payment integration.
+                            E-commerce book platform with subscription access to AI-summarized non-fiction. Stripe-integrated, distraction-free reading experience.
                         </p>
                         <div class="project-tags">
                             <span class="tag">REACT</span>
