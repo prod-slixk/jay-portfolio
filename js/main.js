@@ -16,6 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initScrollAnimations();
     initHackerPopup();
     initHackerTerminal();
+    initGlitchHover();
 });
 
 /* ===================================
@@ -87,7 +88,7 @@ function initHackerPopup() {
         message.textContent = randomResponse;
         
         // Flash effect
-        popup.style.background = 'var(--white)';
+        popup.style.background = '#ffffff';
         setTimeout(() => {
             popup.style.background = '';
         }, 100);
@@ -475,25 +476,20 @@ function initScrollAnimations() {
 }
 
 /* ===================================
-   Glitch Effect on Hover (Optional Enhancement)
+   Glitch Effect on Hover
    =================================== */
-function addGlitchOnHover() {
+function initGlitchHover() {
+    // Seed data-text once so CSS attr(data-text) is always ready
     const glitchElements = document.querySelectorAll('.project-title, .skill-name');
-    
+
     glitchElements.forEach(el => {
-        el.addEventListener('mouseenter', () => {
-            el.classList.add('glitch');
-            el.dataset.text = el.textContent;
-        });
-        
-        el.addEventListener('mouseleave', () => {
-            el.classList.remove('glitch');
-        });
+        // Set once at init — textContent won't change after paint
+        el.dataset.text = el.textContent;
+
+        el.addEventListener('mouseenter', () => el.classList.add('glitch'));
+        el.addEventListener('mouseleave', () => el.classList.remove('glitch'));
     });
 }
-
-// Initialize glitch hover effect
-document.addEventListener('DOMContentLoaded', addGlitchOnHover);
 
 /* ===================================
    Hacker Terminal Typing Effect
@@ -716,18 +712,26 @@ function initThreeScene() {
         const max = document.body.scrollHeight - window.innerHeight;
         const ratio = max > 0 ? window.scrollY / max : 0;
         camTargetY = 14 - ratio * 32;
-    });
+    }, { passive: true });
 
     window.addEventListener('mousemove', (e) => {
         tMouseX = (e.clientX / window.innerWidth  - 0.5) * 14;
         tMouseY = (e.clientY / window.innerHeight - 0.5) * -7;
-    });
+    }, { passive: true });
 
     // ── RENDER LOOP ──
     let t = 0;
+    let rafId = null;
+
+    function pauseRender() { if (rafId) { cancelAnimationFrame(rafId); rafId = null; } }
+    function resumeRender() { if (!rafId) render(); }
+
+    document.addEventListener('visibilitychange', () => {
+        document.hidden ? pauseRender() : resumeRender();
+    });
 
     (function render() {
-        requestAnimationFrame(render);
+        rafId = requestAnimationFrame(render);
         t += 0.007;
 
         // Smooth camera
@@ -770,7 +774,7 @@ function initThreeScene() {
         camera.aspect = window.innerWidth / window.innerHeight;
         camera.updateProjectionMatrix();
         renderer.setSize(window.innerWidth, window.innerHeight);
-    });
+    }, { passive: true });
 }
 
 /* ===================================
