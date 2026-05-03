@@ -63,18 +63,18 @@ function initHackerPopup() {
     // Cycle through alerts
     function cycleAlert() {
         if (isHidden) return;
-        
+
         const alert = alerts[alertIndex];
         const iconEl = popup.querySelector('.popup-icon');
-        
-        // Glitch effect
-        popup.style.transform = 'translateY(-50%) skewX(-2deg)';
+
+        // CSS class handles the skew — no inline transform writes
+        popup.classList.add('is-glitching');
         setTimeout(() => {
-            popup.style.transform = 'translateY(-50%)';
-            iconEl.textContent = alert.icon;
+            popup.classList.remove('is-glitching');
+            iconEl.textContent  = alert.icon;
             message.textContent = alert.msg;
         }, 100);
-        
+
         alertIndex = (alertIndex + 1) % alerts.length;
     }
     
@@ -384,41 +384,34 @@ function initSkillBars() {
    =================================== */
 function initStatCounters() {
     const statNumbers = document.querySelectorAll('.stat-number');
-    
+
+    // Time-based — consistent speed at any frame rate
     const animateCounter = (element, target) => {
-        const duration = 2000;
-        const start = 0;
-        const increment = target / (duration / 16);
-        let current = start;
-        
-        const updateCounter = () => {
-            current += increment;
-            if (current < target) {
-                element.textContent = Math.floor(current);
-                requestAnimationFrame(updateCounter);
-            } else {
-                element.textContent = target;
-            }
-        };
-        
-        updateCounter();
+        const duration  = 2000;
+        const startTime = performance.now();
+
+        function update(now) {
+            const elapsed  = now - startTime;
+            const progress = Math.min(elapsed / duration, 1);
+            // Cubic ease-out
+            const eased    = 1 - Math.pow(1 - progress, 3);
+            element.textContent = Math.floor(eased * target);
+            if (progress < 1) requestAnimationFrame(update);
+            else element.textContent = target;
+        }
+
+        requestAnimationFrame(update);
     };
-    
-    const observerCallback = (entries, observer) => {
+
+    const observer = new IntersectionObserver((entries, obs) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
-                const element = entry.target;
-                const target = parseInt(element.dataset.count);
-                animateCounter(element, target);
-                observer.unobserve(element);
+                animateCounter(entry.target, parseInt(entry.target.dataset.count, 10));
+                obs.unobserve(entry.target);
             }
         });
-    };
-    
-    const observer = new IntersectionObserver(observerCallback, {
-        threshold: 0.5
-    });
-    
+    }, { threshold: 0.5 });
+
     statNumbers.forEach(stat => observer.observe(stat));
 }
 
@@ -426,52 +419,30 @@ function initStatCounters() {
    Scroll Animations
    =================================== */
 function initScrollAnimations() {
-    // Add fade-in animation to sections
+    // Section reveal — CSS does all the visual work (.section / .section.is-visible in style.css)
     const sections = document.querySelectorAll('.section');
-    
-    const fadeInOnScroll = (entries, observer) => {
+    const nav      = document.querySelector('.nav');
+
+    const sectionObserver = new IntersectionObserver((entries, obs) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
-                entry.target.classList.add('visible');
-                observer.unobserve(entry.target);
+                entry.target.classList.add('is-visible');
+                obs.unobserve(entry.target);
             }
         });
-    };
-    
-    const observer = new IntersectionObserver(fadeInOnScroll, {
-        threshold: 0.1,
-        rootMargin: '0px 0px -50px 0px'
-    });
-    
-    sections.forEach(section => {
-        section.style.opacity = '0';
-        section.style.transform = 'perspective(1200px) rotateX(8deg) translateY(50px) translateZ(-40px)';
-        section.style.transition = 'opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1), transform 0.9s cubic-bezier(0.16, 1, 0.3, 1)';
-        observer.observe(section);
-    });
+    }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
 
-    // Add visible styles
-    const style = document.createElement('style');
-    style.textContent = `
-        .section.visible {
-            opacity: 1 !important;
-            transform: perspective(1200px) rotateX(0deg) translateY(0) translateZ(0) !important;
-        }
-    `;
-    document.head.appendChild(style);
-    
-    // Navbar background on scroll
-    const nav = document.querySelector('.nav');
-    
+    sections.forEach(s => sectionObserver.observe(s));
+
+    // Nav scroll state — RAF-throttled, class-based (no inline style writes)
+    let scrollRafId = null;
     window.addEventListener('scroll', () => {
-        if (window.scrollY > 100) {
-            nav.style.background = 'rgba(0, 0, 0, 0.98)';
-            nav.style.boxShadow = '0 2px 20px rgba(255, 255, 255, 0.05)';
-        } else {
-            nav.style.background = 'rgba(0, 0, 0, 0.95)';
-            nav.style.boxShadow = 'none';
-        }
-    });
+        if (scrollRafId) return;
+        scrollRafId = requestAnimationFrame(() => {
+            nav.classList.toggle('is-scrolled', window.scrollY > 100);
+            scrollRafId = null;
+        });
+    }, { passive: true });
 }
 
 /* ===================================
@@ -566,22 +537,30 @@ function init3DTilt() {
     const cards = document.querySelectorAll('.project-card, .skill-card, .stat-card');
 
     cards.forEach(card => {
+        let rafId  = null;
+        let rotX   = 0, rotY = 0;
+
         card.addEventListener('mousemove', (e) => {
             const rect = card.getBoundingClientRect();
-            const x  = e.clientX - rect.left;
-            const y  = e.clientY - rect.top;
-            const cx = rect.width  / 2;
-            const cy = rect.height / 2;
-            const rotX = ((y - cy) / cy) * -10;
-            const rotY = ((x - cx) / cx) *  10;
-            card.style.transition = 'transform 0.06s linear, box-shadow 0.06s linear';
-            card.style.transform  = `perspective(900px) rotateX(${rotX}deg) rotateY(${rotY}deg) translateZ(14px)`;
-            card.style.boxShadow  = `${-rotY * 1.5}px ${rotX * 1.5}px 30px rgba(255,255,255,0.06)`;
-        });
+            // Capture values (read phase — no layout thrash)
+            rotX = ((e.clientY - rect.top  - rect.height / 2) / (rect.height / 2)) * -10;
+            rotY = ((e.clientX - rect.left - rect.width  / 2) / (rect.width  / 2)) *  10;
+
+            // Batch write into next animation frame
+            if (!rafId) {
+                rafId = requestAnimationFrame(() => {
+                    card.style.transition = 'transform 0.06s linear, box-shadow 0.06s linear';
+                    card.style.transform  = `perspective(900px) rotateX(${rotX}deg) rotateY(${rotY}deg) translateZ(14px)`;
+                    card.style.boxShadow  = `${-rotY * 1.5}px ${rotX * 1.5}px 30px rgba(255,255,255,0.06)`;
+                    rafId = null;
+                });
+            }
+        }, { passive: true });
 
         card.addEventListener('mouseleave', () => {
+            if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
             card.style.transition = 'transform 0.55s cubic-bezier(0.23,1,0.32,1), box-shadow 0.55s ease';
-            card.style.transform  = 'perspective(900px) rotateX(0deg) rotateY(0deg) translateZ(0px)';
+            card.style.transform  = '';
             card.style.boxShadow  = '';
         });
     });
@@ -591,26 +570,39 @@ function init3DTilt() {
    Hero Depth Parallax
    =================================== */
 function initHeroParallax() {
-    const hero = document.querySelector('.hero');
+    const hero    = document.querySelector('.hero');
     const content = document.querySelector('.hero-content');
     const ascii   = document.querySelector('.ascii-art');
     if (!hero || !content) return;
 
     let tX = 0, tY = 0, cX = 0, cY = 0;
+    let rafId = null;
+
+    function loop() {
+        cX += (tX - cX) * 0.055;
+        cY += (tY - cY) * 0.055;
+
+        content.style.transform = `perspective(900px) rotateX(${-cY}deg) rotateY(${cX}deg)`;
+        if (ascii) ascii.style.transform = `translate(${cX * 7}px, ${cY * 7}px)`;
+
+        // Stop loop once LERP has settled — restart on next mousemove
+        const settled = Math.abs(tX - cX) < 0.001 && Math.abs(tY - cY) < 0.001;
+        rafId = settled ? null : requestAnimationFrame(loop);
+    }
+
+    function startLoop() {
+        if (!rafId) rafId = requestAnimationFrame(loop);
+    }
 
     hero.addEventListener('mousemove', (e) => {
         const rect = hero.getBoundingClientRect();
         tX = (e.clientX - rect.left  - rect.width  / 2) * 0.018;
         tY = (e.clientY - rect.top   - rect.height / 2) * 0.012;
-    });
+        startLoop();
+    }, { passive: true });
 
-    hero.addEventListener('mouseleave', () => { tX = 0; tY = 0; });
-
-    (function loop() {
-        cX += (tX - cX) * 0.055;
-        cY += (tY - cY) * 0.055;
-        content.style.transform = `perspective(900px) rotateX(${-cY}deg) rotateY(${cX}deg)`;
-        if (ascii) ascii.style.transform = `translate(${cX * 7}px, ${cY * 7}px)`;
-        requestAnimationFrame(loop);
-    })();
+    hero.addEventListener('mouseleave', () => {
+        tX = 0; tY = 0;
+        startLoop(); // let LERP ease back to zero
+    }, { passive: true });
 }

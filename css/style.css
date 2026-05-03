@@ -173,10 +173,13 @@ h1, h2, h3, h4, h5, h6, p, span, label {
 }
 
 @keyframes textGlitch {
-    0%, 100% { text-shadow:  2px 0 var(--gray-700), -2px 0 var(--gray-400); }
-    25%       { text-shadow: -2px 0 var(--gray-700),  2px 0 var(--gray-400); }
-    50%       { text-shadow:  2px -2px var(--gray-700), -2px 2px var(--gray-400); }
-    75%       { text-shadow: -2px 2px var(--gray-700),  2px -2px var(--gray-400); }
+    /* transform-only — GPU composited, zero repaints */
+    0%, 85%, 100% { transform: none; }
+    87%            { transform: translateX(-3px) skewX(-1deg); }
+    89%            { transform: translateX(3px)  skewX(1deg); }
+    91%            { transform: translateX(-2px); }
+    93%            { transform: translateX(2px); }
+    95%            { transform: translateX(-1px); }
 }
 
 /* ===================================
@@ -653,7 +656,6 @@ h1, h2, h3, h4, h5, h6, p, span, label {
     border: 2px solid var(--white);
     overflow: hidden;
     transform-style: preserve-3d;
-    will-change: transform;
     transition: transform var(--t-spring), box-shadow var(--t-spring);
 }
 
@@ -730,7 +732,6 @@ h1, h2, h3, h4, h5, h6, p, span, label {
     gap: var(--space-lg);
     transition: border-color var(--t-fast), transform var(--t-fast);
     transform-style: preserve-3d;
-    will-change: transform;
 }
 
 .stat-card:hover {
@@ -780,7 +781,7 @@ h1, h2, h3, h4, h5, h6, p, span, label {
     content: '';
     position: absolute;
     inset: 0;
-    background-image: url('https://wallpapercave.com/wp/wp4020210.jpg');
+    background-image: url('../assets/skills-bg.jpg');
     background-size: cover;
     background-position: center top;
     opacity: 0.35;
@@ -820,7 +821,6 @@ h1, h2, h3, h4, h5, h6, p, span, label {
     position: relative;
     overflow: hidden;
     transform-style: preserve-3d;
-    will-change: transform;
 }
 
 .skill-card::before {
@@ -902,7 +902,6 @@ h1, h2, h3, h4, h5, h6, p, span, label {
     background-image: url('../assets/skills-bg.jpg');
     background-size: cover;
     background-position: center;
-    background-attachment: fixed;
     opacity: 0.08;
     filter: grayscale(1) brightness(0.6);
     z-index: 0;
@@ -952,11 +951,16 @@ h1, h2, h3, h4, h5, h6, p, span, label {
     display: flex;
     flex-direction: column;
     transform-style: preserve-3d;
-    will-change: transform;
     transition:
         border-color var(--t-normal),
         transform var(--t-spring),
         box-shadow var(--t-spring);
+}
+/* Promote to GPU layer only while actively interacting */
+.project-card:hover,
+.skill-card:hover,
+.stat-card:hover {
+    will-change: transform;
 }
 
 /* Corner targeting brackets */
@@ -1010,6 +1014,8 @@ h1, h2, h3, h4, h5, h6, p, span, label {
     border-bottom: 2px solid var(--gray-700);
     transition: border-color var(--t-normal);
     flex-shrink: 0;
+    /* isolate scan-sweep and img scale into their own layer */
+    contain: paint;
 }
 
 /* Top-row cards (hero + sidebar) get taller images */
@@ -1024,14 +1030,15 @@ h1, h2, h3, h4, h5, h6, p, span, label {
 .project-image::before {
     content: '';
     position: absolute;
-    top: -2px;
+    top: 0;
     left: 0;
     right: 0;
-    height: 1px;
+    height: 2px;
     background: rgba(255, 255, 255, 0.7);
     z-index: 3;
     opacity: 0;
     pointer-events: none;
+    will-change: transform, opacity;
 }
 
 .project-card:hover .project-image::before {
@@ -1039,8 +1046,9 @@ h1, h2, h3, h4, h5, h6, p, span, label {
 }
 
 @keyframes scanSweep {
-    0%   { top: 0;    opacity: 0.9; }
-    100% { top: 100%; opacity: 0;   }
+    /* transform:translateY — GPU composited, no layout thrash */
+    0%   { transform: translateY(0);     opacity: 0.9; }
+    100% { transform: translateY(350px); opacity: 0;   }
 }
 
 .project-img {
@@ -1945,6 +1953,33 @@ h1, h2, h3, h4, h5, h6, p, span, label {
 }
 
 /* ===================================
+   Scroll Reveal — class-based (no inline style injection)
+   =================================== */
+.section {
+    opacity: 0;
+    transform: perspective(1200px) rotateX(5deg) translateY(40px) translateZ(-30px);
+    transition:
+        opacity  0.9s cubic-bezier(0.16, 1, 0.3, 1),
+        transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.section.is-visible {
+    opacity: 1;
+    transform: none;
+}
+
+/* Nav scrolled state — toggled by JS class, no inline styles */
+.nav.is-scrolled {
+    background: rgba(0, 0, 0, 0.98) !important;
+    box-shadow: 0 2px 20px rgba(255, 255, 255, 0.05);
+}
+
+/* Popup glitch flash — CSS class, no inline transform */
+.hacker-popup.is-glitching {
+    transform: translateY(-50%) skewX(-2deg);
+}
+
+/* ===================================
    Reduced Motion
    =================================== */
 @media (prefers-reduced-motion: reduce) {
@@ -1954,6 +1989,13 @@ h1, h2, h3, h4, h5, h6, p, span, label {
     .glitch-intense::after { animation: none; }
 
     .scanlines { display: none; }
+
+    /* Reveal sections immediately — no scroll animation */
+    .section {
+        opacity: 1 !important;
+        transform: none !important;
+        transition: none !important;
+    }
 
     * {
         animation-duration: 0.01ms !important;
